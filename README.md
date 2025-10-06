@@ -22,15 +22,18 @@ Technologies Used
 Installation and Setup
 
 Clone the repository
+
 git clone https://github.com/your-username/LinkUp.git
 cd LinkUp
 
 Backend Setup
+
 cd server
 npm install
 npm run server
 
 Frontend Setup
+
 cd client
 npm install
 npm run dev
@@ -39,10 +42,11 @@ npm run dev
 The backend runs on http://localhost:5000 (default) and the frontend runs on http://localhost:3000. Ensure both are running to use the application properly.
 
 Project Structure
+
 LinkUp/
-├─ client/       # React frontend
-├─ server/       # Node.js backend
-├─ README.md
+  ├─ client/       # React frontend
+  ├─ server/       # Node.js backend
+  ├─ README.md
 
 Usage
 
