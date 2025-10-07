@@ -11,7 +11,7 @@ export const ChatProvider = ({ children })=>{
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [unseenMessages, setUnseenMessages] = useState({});
-    const { socket, axios } = useContext(AuthContext);
+    const {socket, axios} = useContext(AuthContext);
 
     // Function to get all users for sidebar
     const getUsers = async()=>{
@@ -63,9 +63,7 @@ export const ChatProvider = ({ children })=>{
                 axios.put(`/api/messages/mark/${newMessage._id}`);
             }else{
                 setUnseenMessages((prevUnseenMessages) => ({
-                    ...prevUnseenMessages, [newMessage.senderId]: 
-                    prevUnseenMessages[newMessage.senderId] ? prevUnseenMessages
-                    [newMessage.senderId] + 1 : 1,
+                    ...prevUnseenMessages, [newMessage.senderId] : prevUnseenMessages[newMessage.senderId] ? prevUnseenMessages[newMessage.senderId] + 1 : 1
                 }))
             }
         })

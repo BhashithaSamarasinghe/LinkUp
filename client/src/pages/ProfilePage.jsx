@@ -1,4 +1,4 @@
-import React, { useContext, useState} from 'react'
+import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import assets from '../assets/assets';
 import { AuthContext } from '../../context/AuthContext';
@@ -24,8 +24,8 @@ const ProfilePage = () => {
     const reader = new FileReader();
     reader.readAsDataURL(selectedImg);
     reader.onload = async () => {
-      const base64Img = reader.result;
-      await updateProfile({profilePic: base64Img, fullName: name, bio});
+      const base64Image = reader.result;
+      await updateProfile({profilePic: base64Image, fullName: name, bio});
       navigate('/');
     }
   }
@@ -41,7 +41,8 @@ const ProfilePage = () => {
             <img src={selectedImg ? URL.createObjectURL(selectedImg) : assets.avatar_icon} alt='' className={`w-12 h-12 ${selectedImg && 'rounded-full'}`}/>
             upload profile image
           </label>
-          <input value={name} onChange={(e)=>setName(e.target.value)} type="text" required placeholder='Your name' className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500'/>
+          <input onChange={(e)=>setName(e.target.value)} value={name}
+           type="text" required placeholder='Your name' className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500'/>
           <textarea onChange={(e)=>setBio(e.target.value)} value={bio} placeholder="Write profile bio" required className="p-2 border
         border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500" rows={4}></textarea>
         <button type="submit" className="bg-gradient-to-r from-purple-400 to-violet-600 text-white p-2 rounded-full text-lg cursor-pointer">Save</button>
