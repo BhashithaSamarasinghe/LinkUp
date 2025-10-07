@@ -25,7 +25,7 @@ const LoginPage = () => {
   return (
     <div className='min-h-screen bg-cover bg-center flex items-center justify-center gap-8 sm:justify-evenly max-sm:flex-col backdrop-blur-2xl'>
       {/* Left */}
-      <img src={assets.logo_big} alt='' className='w-[min(30vw,250px)]' />
+      <img src={assets.biglogo1} alt='' className='w-[min(30vw,250px)]' />
 
       {/* Right */}
       <form onSubmit={onSubmitHandler} className='border-2 bg-white/8 text-white border-gray-500 p-6 flex flex-col gap-6 rounded-lg shadow-lg'>
@@ -54,7 +54,7 @@ const LoginPage = () => {
         rows={4} className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'
         placeholder='provide a short bio ...' required></textarea>
         )}
-        <button type='submit' className='py-3 bg-gradient-to-r from-purple-400 to-violet-600 text-white rounded-md cursor-pointer'>
+        <button type='submit' className='py-3 bg-gradient-to-r from-[#97a0ee] to-[#6366F1] text-white rounded-md cursor-pointer'>
           {currState === "Sign up" ? "Create Account" : "Login Now"}
         </button>
       
@@ -67,10 +67,10 @@ const LoginPage = () => {
           {currState === "Sign up" ? (
             <p className='text-sm text-gray-600'>Already have an account? <span
             onClick={()=>{setCurrState("Login"); setIsDataSubmitted(false)}}
-            className='font-medium text-violet-500 cursor-pointer'>Login here</span></p>
+            className='font-medium text-[#4F46E5] cursor-pointer'>Login here</span></p>
           ) : (
             <p className='text-sm text-gray-600'>Create an account <span onClick={() =>
-              setCurrState("Sign up")} className='font-medium text-violet-500 cursor-pointer'>Click here</span></p>
+              setCurrState("Sign up")} className='font-medium text-[#4F46E5] cursor-pointer'>Click here</span></p>
           )}
         </div>
 

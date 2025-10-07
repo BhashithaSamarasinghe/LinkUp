@@ -48,10 +48,12 @@ The backend runs on http://localhost:5000 (default) and the frontend runs on htt
 
 ## 📂 Project Structure
 
+```bash
 LinkUp/
   ├─ client/       # React frontend
   ├─ server/       # Node.js backend
   └─ README.md
+```
 
 🚀 Usage
 
