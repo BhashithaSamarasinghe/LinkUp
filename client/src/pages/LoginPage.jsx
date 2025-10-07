@@ -35,7 +35,7 @@ const LoginPage = () => {
 
       {currState === "Sign up" && !isDataSubmitted && (
         <input onChange={(e)=>setFullName(e.target.value)} value={fullName}
-        type="text" className='p-2 border border-gray-500 rounded-md focus:outline-none' placeholder='Full Name' required/>
+        type="text" className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500' placeholder='Full Name' required/>
       )}
 
       {!isDataSubmitted && (
