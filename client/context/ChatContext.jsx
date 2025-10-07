@@ -16,7 +16,7 @@ export const ChatProvider = ({ children })=>{
     // Function to get all users for sidebar
     const getUsers = async()=>{
         try{
-            const {data} = await axios.get("/api/message/users");
+            const {data} = await axios.get("/api/messages/users");
             if (data.success){
                 setUsers(data.users)
                 setUnseenMessages(data.unseenMessages)
@@ -29,7 +29,7 @@ export const ChatProvider = ({ children })=>{
     // Function to get all messages for selected user
     const getMessages = async(userId)=>{
         try{
-            const {data} = await axios.get(`/api/message/${userId}`);
+            const {data} = await axios.get(`/api/messages/${userId}`);
             if (data.success){
                 setMessages(data.messages)
             }
@@ -41,14 +41,14 @@ export const ChatProvider = ({ children })=>{
     // Function to sent message to selected user
     const sendMessage = async (messageData)=>{
         try{
-            const {data} = await axios.post(`/api/message/send/${selectedUser._id}`, messageData);
+            const {data} = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData);
             if (data.success){
                 setMessages((prevMessages) => [...prevMessages, data.newMessage]);
             }else{
-                toast.error(data.message)
+                toast.error(data.message);
             }
         }catch(error){
-            toast.error(error.message)
+            toast.error(error.message);
         }
     }
 
@@ -57,7 +57,7 @@ export const ChatProvider = ({ children })=>{
         if (!socket) return;
 
         socket.on("newMessage", (newMessage)=>{
-            if (selectedUser && newMessage.sender === selectedUser._id){
+            if (selectedUser && newMessage.senderId === selectedUser._id){
                 newMessage.seen = true;
                 setMessages((prevMessages) => [...prevMessages, newMessage]);
                 axios.put(`/api/messages/mark/${newMessage._id}`);
@@ -72,7 +72,7 @@ export const ChatProvider = ({ children })=>{
     }
 
     // Function to unsubscribe from messages
-    const unsubscribeFromMessages = async ()=>{
+    const unsubscribeFromMessages = ()=>{
         if (socket) socket.off("newMessage");
     }
 
@@ -82,13 +82,12 @@ export const ChatProvider = ({ children })=>{
     },[socket, selectedUser])
 
 
-
     const value = {
         messages,
         users,
         selectedUser,
         getUsers,
-        setMessages,
+        getMessages,
         sendMessage,
         setSelectedUser,
         unseenMessages,
