@@ -2,10 +2,10 @@ import express from "express";
 import "dotenv/config";
 import cors from "cors";
 import http from "http";
-import {connectDB} from "./lib/db.js";
+import { connectDB } from "./lib/db.js";
 import userRouter from "./routes/userRoutes.js";
-import messageRoutes from "./routes/messageRoutes.js";
-import {Server} from "socket.io";
+import messageRouter from "./routes/messageRoutes.js";
+import { Server } from "socket.io";
 
 // Create Express app and HTTP server
 const app = express();
@@ -17,22 +17,20 @@ export const io = new Server(server, {
 })
 
 // Store online users
-export const userSocketMap = {}; // {userId: socketId}
+export const userSocketMap = {}; // { userId: socketId }
 
 // Socket.io connection handler
 io.on("connection", (socket)=>{
     const userId = socket.handshake.query.userId;
-    console.log("User connected: " + userId);
+    console.log("User Connected", userId);
 
-    if(userId){
-        userSocketMap[userId] = socket.id;
-    }
-
+    if(userId) userSocketMap[userId] = socket.id;
+    
     // Emit online users to all connected clients
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
     socket.on("disconnect", ()=>{
-        console.log("User disconnected: " + userId);
+        console.log("User Disconnected", userId);
         delete userSocketMap[userId];
         io.emit("getOnlineUsers", Object.keys(userSocketMap))
     })
@@ -42,10 +40,10 @@ io.on("connection", (socket)=>{
 app.use(express.json({limit: "4mb"}));
 app.use(cors());
 
-//Routes setup
+// Routes setup
 app.use("/api/status", (req, res)=> res.send("Server is live"));
 app.use("/api/auth", userRouter);
-app.use("/api/messages", messageRoutes);
+app.use("/api/messages", messageRouter)
 
 // Connect to MongoDB
 await connectDB();

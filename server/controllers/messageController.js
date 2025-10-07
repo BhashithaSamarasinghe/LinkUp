@@ -1,7 +1,7 @@
 import Message from "../models/Message.js";
 import User from "../models/User.js";
-import cloudinary from "../lib/cloudinary.js";
-import { userSocketMap, io } from "../server.js";
+import cloudinary from "../lib/cloudinary.js"
+import { io, userSocketMap } from "../server.js";
 
 
 // Get all users except the logged in user
@@ -49,7 +49,7 @@ export const getMessages = async (req, res) =>{
 }
 
 // API to mark messages as seen using message ids
-export const markMessagesAsSeen = async (req, res) =>{
+export const markMessageAsSeen = async (req, res) =>{
     try {
         const {id} = req.params;
         await Message.findByIdAndUpdate(id, {seen: true});
@@ -84,9 +84,10 @@ export const sendMessage = async (req, res) =>{
         // Emit the new message to the receiver socket if online
         const receiverSocketId = userSocketMap[receiverId];
         if(receiverSocketId){
-            io.to(receiverSocketId).emit("getMessage", newMessage);
+            io.to(receiverSocketId).emit("newMessage", newMessage)
         }
         res.json({ success: true, message: newMessage });
+        //res.json({success: true, newMessage}); in downloaded version
 
     } catch (error) {
         console.log(error.message);

@@ -1,7 +1,7 @@
+import { generateToken } from "../lib/utils.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../lib/utils.js";
-import cloudinary from "../lib/cloudinary.js";
+import cloudinary from "../lib/cloudinary.js"
 
 
 // Signup a new user
@@ -51,7 +51,7 @@ export const login = async (req, res) =>{
 }
 
 // Controller to check if user is authenticated
-export const checkAuth = async (req, res)=>{
+export const checkAuth = (req, res)=>{
     res.json({ success: true, user: req.user });
 }
 
@@ -70,7 +70,8 @@ export const updateProfile = async (req, res)=>{
             updatedUser = await User.findByIdAndUpdate(userId, {profilePic: upload.secure_url,
                 bio, fullName}, {new: true});
         }
-        res.json({ success: true, user: updatedUser, message: "Profile updated successfully" })
+        // res.json({ success: true, user: updatedUser, message: "Profile updated successfully" })
+        res.json({success: true, user: updatedUser})
     } catch (error) {
         console.log(error.message);
         res.json({ success: false, message: error.message })
