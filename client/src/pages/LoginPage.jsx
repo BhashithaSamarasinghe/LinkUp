@@ -8,13 +8,28 @@ const LoginPage = () => {
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [bio, setBio] = useState("")
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false); // New state for checkbox
 
   const {login} = useContext(AuthContext);
 
   const onSubmitHandler = (event)=>{
     event.preventDefault();
+    
+    // Check if terms are agreed
+    if (!agreedToTerms) {
+      alert("Please agree to the terms of use & privacy policy to continue.");
+      return;
+    }
+
+    // Check if passwords match during signup
+    if (currState === 'Sign up' && !isDataSubmitted && password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
     if(currState === 'Sign up' && !isDataSubmitted){
       setIsDataSubmitted(true)
       return;
@@ -46,6 +61,11 @@ const LoginPage = () => {
           <input onChange={(e)=>setPassword(e.target.value)} value={password}
           type="password" placeholder='Password' required className='p-2 border
           border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'/>
+          {currState === "Sign up" && (
+            <input onChange={(e)=>setConfirmPassword(e.target.value)} value={confirmPassword}
+            type="password" placeholder='Confirm Password' required className='p-2 border
+            border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'/>
+          )}
         </>
       )}
 
@@ -54,23 +74,29 @@ const LoginPage = () => {
         rows={4} className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'
         placeholder='provide a short bio ...' required></textarea>
         )}
+
+        <div className='flex items-center gap-2 text-sm text-gray-500'>
+          <input 
+            type="checkbox" 
+            checked={agreedToTerms}
+            onChange={(e) => setAgreedToTerms(e.target.checked)}
+            required
+          />
+          <p>Agree to the terms of use & privacy policy.</p>
+        </div>
+        
         <button type='submit' className='py-3 bg-gradient-to-r from-[#97a0ee] to-[#6366F1] text-white rounded-md cursor-pointer'>
           {currState === "Sign up" ? "Create Account" : "Login Now"}
         </button>
-      
-        <div className='flex items-center gap-2 text-sm text-gray-500'>
-          <input type="checkbox" />
-          <p>Agree to the terms of use & privacy policy.</p>
-        </div>
 
         <div className='flex flex-col gap-2'>
           {currState === "Sign up" ? (
             <p className='text-sm text-gray-600'>Already have an account? <span
-            onClick={()=>{setCurrState("Login"); setIsDataSubmitted(false)}}
+            onClick={()=>{setCurrState("Login"); setIsDataSubmitted(false); setAgreedToTerms(false); setConfirmPassword("")}}
             className='font-medium text-[#4F46E5] cursor-pointer'>Login here</span></p>
           ) : (
-            <p className='text-sm text-gray-600'>Create an account <span onClick={() =>
-              setCurrState("Sign up")} className='font-medium text-[#4F46E5] cursor-pointer'>Click here</span></p>
+            <p className='text-sm text-gray-600'>Create an account <span onClick={() => {
+              setCurrState("Sign up"); setAgreedToTerms(false); setConfirmPassword("")}} className='font-medium text-[#4F46E5] cursor-pointer'>Click here</span></p>
           )}
         </div>
 
