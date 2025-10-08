@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { ChatContext } from '../../context/ChatContext';
 
-const SideBar = () => {
+const SideNav = () => {
 
     const {getUsers, users, selectedUser, setSelectedUser,
         unseenMessages, setUnseenMessages } = useContext(ChatContext);
@@ -65,4 +65,4 @@ const SideBar = () => {
   )
 }
 
-export default SideBar
+export default SideNav
