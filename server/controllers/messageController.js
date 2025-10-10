@@ -80,10 +80,13 @@ export const sendMessage = async (req, res) =>{
             image: imageUrl
         })
 
-        // Emit the new message to the receiver's socket
-        const receiverSocketId = userSocketMap[receiverId];
-        if (receiverSocketId){
-            io.to(receiverSocketId).emit("newMessage", newMessage)
+        // Emit the new message to all of the receiver's sockets
+        const receiverSocketIds = userSocketMap[receiverId];
+        if (receiverSocketIds && receiverSocketIds.size > 0) {
+            // Emit to each socket ID in the Set
+            receiverSocketIds.forEach(socketId => {
+                io.to(socketId).emit("newMessage", newMessage);
+            });
         }
 
         res.json({success: true, newMessage});
