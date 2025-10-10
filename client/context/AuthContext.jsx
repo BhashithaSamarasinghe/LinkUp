@@ -24,7 +24,10 @@ export const AuthProvider = ({ children }) => {
                 connectSocket(data.user)
             }
         } catch (error) {
-            toast.error(error.message)
+            // Don't show error toast for 401 authentication failures - this is expected when not logged in
+            if (error.response?.status !== 401) {
+                toast.error(error.message)
+            }
         }
     }
 
@@ -34,11 +37,16 @@ export const AuthProvider = ({ children }) => {
         try {
             const { data } = await axios.post(`/api/auth/${state}`, credentials);
             if(data.success) {
+                // Set token first to ensure it's available for socket connection
+                const newToken = data.token;
+                localStorage.setItem("token", newToken);
+                axios.defaults.headers.common["token"] = newToken;
+                setToken(newToken);
+                
+                // Then update user and connect socket
                 setAuthUser(data.userData);
-                connectSocket(data.userData);
-                axios.defaults.headers.common["token"] = data.token;
-                setToken(data.token);
-                localStorage.setItem("token", data.token);
+                setTimeout(() => connectSocket(data.userData), 100); // Small delay to ensure token is saved
+                
                 toast.success(data.message);
             }else{
                 toast.error(data.message);
@@ -75,20 +83,41 @@ export const AuthProvider = ({ children }) => {
     //Connect socket function to handle socket connection and online users updates
     const connectSocket = (userData) => {
         if(!userData || socket?.connected) return;
+        
+        // Important: For the login flow, we need to make sure we're using the most recent token
+        // In login(), we might call connectSocket before the token is saved to localStorage
+        const currentToken = localStorage.getItem("token");
+        
+        // If we have no token, retry in 500ms (allows time for token to be saved in login function)
+        if (!currentToken) {
+            console.log("No token found for socket connection, retrying in 500ms...");
+            setTimeout(() => connectSocket(userData), 500);
+            return;
+        }
+        
         const newSocket = io(backendUrl, {
-            query: { userId: userData._id }
+            auth: { token: currentToken }
         });
+        
         newSocket.connect();
         setSocket(newSocket);
+        
+        // Handle connection errors (new)
+        newSocket.on("connect_error", (err) => {
+            console.error("Socket connection error:", err.message);
+            toast.error("Real-time connection failed: " + err.message);
+        });
+        
         newSocket.on("getOnlineUsers", (userIds) => {
             setOnlineUsers(userIds);
         });
-
     }
 
     useEffect(() => {
         if(token) {
+            // Set both the custom token header and standard Authorization header
             axios.defaults.headers.common["token"] = token;
+            axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         }
         checkAuth();
     },[])
