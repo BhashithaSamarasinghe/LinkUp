@@ -6,6 +6,7 @@ import { connectDB } from "./lib/db.js";
 import userRouter from "./routes/userRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
 import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
 
 // Create Express app and HTTP server
 const app = express();
@@ -16,22 +17,57 @@ export const io = new Server(server, {
     cors: {origin: "*"}
 })
 
-// Store online users
-export const userSocketMap = {}; // { userId: socketId }
+// Store online users - now maps userId to a Set of socket IDs
+export const userSocketMap = {}; // { userId: Set([socketId1, socketId2, ...]) }
+
+// Socket.io middleware to authenticate connections
+io.use((socket, next) => {
+    try {
+        const token = socket.handshake.auth?.token;
+        
+        // For backward compatibility, still check query param
+        const queryToken = socket.handshake.query?.token;
+        
+        if (!token && !queryToken) {
+            return next(new Error("Authentication error: No token provided"));
+        }
+        
+        const decoded = jwt.verify(token || queryToken, process.env.JWT_SECRET);
+        socket.userId = decoded.userId;
+        return next();
+    } catch (err) {
+        console.log("Socket authentication error:", err.message);
+        return next(new Error("Authentication error: Invalid token"));
+    }
+});
 
 // Socket.io connection handler
 io.on("connection", (socket)=>{
-    const userId = socket.handshake.query.userId;
+    const userId = socket.userId;
     console.log("User Connected", userId);
 
-    if(userId) userSocketMap[userId] = socket.id;
+    // Initialize Set if it doesn't exist
+    if(!userSocketMap[userId]) userSocketMap[userId] = new Set();
+    
+    // Add this socket ID to the user's set of connections
+    userSocketMap[userId].add(socket.id);
     
     // Emit online users to all connected clients
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
     socket.on("disconnect", ()=>{
         console.log("User Disconnected", userId);
-        delete userSocketMap[userId];
+        
+        if(userSocketMap[userId]) {
+            // Remove this socket from the user's connections
+            userSocketMap[userId].delete(socket.id);
+            
+            // If no more sockets, delete the user entry entirely
+            if(userSocketMap[userId].size === 0) {
+                delete userSocketMap[userId];
+            }
+        }
+        
         io.emit("getOnlineUsers", Object.keys(userSocketMap))
     })
 })
